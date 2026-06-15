@@ -1,1 +1,2297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StudyShare – Share Knowledge, Empower Learning</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<style>
+/* ==================== CSS VARIABLES ==================== */
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --primary-light: #3b82f6;
+  --accent: #06b6d4;
+  --accent2: #8b5cf6;
+  --white: #ffffff;
+  --off-white: #f8faff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-400: #9ca3af;
+  --gray-600: #4b5563;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --radius: 16px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(37,99,235,0.10);
+  --shadow-lg: 0 8px 48px rgba(37,99,235,0.16);
+  --transition: all 0.3s cubic-bezier(.4,0,.2,1);
+}
 
+/* ==================== RESET & BASE ==================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--white);
+  color: var(--gray-800);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; }
+button { cursor: pointer; border: none; outline: none; }
+input, textarea, select { font-family: inherit; }
+
+/* ==================== SCROLLBAR ==================== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--gray-100); }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 99px; }
+
+/* ==================== LOADING SCREEN ==================== */
+#loading-screen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #06b6d4 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+#loading-screen.hidden { opacity: 0; visibility: hidden; }
+.loading-logo {
+  text-align: center; color: white; margin-bottom: 40px;
+  animation: loadPulse 1.5s ease-in-out infinite;
+}
+.loading-logo i { font-size: 64px; margin-bottom: 16px; display: block; }
+.loading-logo h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; }
+.loading-logo p { font-size: 1rem; opacity: 0.8; margin-top: 4px; }
+.loading-bar-wrap {
+  width: 260px; height: 4px; background: rgba(255,255,255,0.25);
+  border-radius: 99px; overflow: hidden;
+}
+.loading-bar {
+  height: 100%; width: 0%; background: white;
+  border-radius: 99px; transition: width 0.1s linear;
+}
+.loading-pct { color: white; margin-top: 12px; font-size: 0.9rem; opacity: 0.8; }
+@keyframes loadPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+/* ==================== NAVBAR ==================== */
+#navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(37,99,235,0.08);
+  transition: var(--transition);
+}
+#navbar.scrolled { box-shadow: 0 2px 20px rgba(37,99,235,0.12); }
+.nav-inner {
+  max-width: 1280px; margin: 0 auto; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 68px;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 800; font-size: 1.3rem; color: var(--primary);
+}
+.nav-logo i { font-size: 1.5rem; }
+.nav-links {
+  display: flex; align-items: center; gap: 4px;
+  list-style: none;
+}
+.nav-links a {
+  padding: 8px 12px; border-radius: var(--radius-sm);
+  font-size: 0.88rem; font-weight: 500; color: var(--gray-600);
+  transition: var(--transition);
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--primary); background: rgba(37,99,235,0.07);
+}
+.nav-auth { display: flex; align-items: center; gap: 10px; }
+.btn-login {
+  padding: 8px 18px; border-radius: var(--radius-sm);
+  font-size: 0.88rem; font-weight: 600; color: var(--primary);
+  border: 1.5px solid var(--primary); background: transparent;
+  transition: var(--transition);
+}
+.btn-login:hover { background: var(--primary); color: white; }
+.btn-signup {
+  padding: 8px 18px; border-radius: var(--radius-sm);
+  font-size: 0.88rem; font-weight: 600; color: white;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  transition: var(--transition);
+}
+.btn-signup:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(37,99,235,0.35); }
+.nav-hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  background: none; padding: 8px; border-radius: var(--radius-sm);
+}
+.nav-hamburger span {
+  display: block; width: 22px; height: 2px;
+  background: var(--primary); border-radius: 2px;
+  transition: var(--transition);
+}
+.mobile-menu {
+  display: none; position: fixed; inset: 68px 0 0;
+  background: white; z-index: 999; overflow-y: auto;
+  padding: 20px 24px;
+  border-top: 1px solid var(--gray-200);
+}
+.mobile-menu.open { display: block; }
+.mobile-menu a {
+  display: block; padding: 12px 0; font-weight: 500;
+  color: var(--gray-700); border-bottom: 1px solid var(--gray-100);
+  transition: var(--transition);
+}
+.mobile-menu a:hover { color: var(--primary); }
+.mobile-menu-auth { margin-top: 16px; display: flex; gap: 10px; }
+
+/* ==================== HERO SECTION ==================== */
+#home {
+  min-height: 100vh; padding-top: 68px;
+  background: linear-gradient(160deg, #f0f7ff 0%, #e8f4ff 40%, #f0fdf4 100%);
+  position: relative; overflow: hidden;
+  display: flex; align-items: center;
+}
+.hero-blobs {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+}
+.blob {
+  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3;
+  animation: blobMove 12s ease-in-out infinite alternate;
+}
+.blob-1 { width: 500px; height: 500px; background: #bfdbfe; top: -100px; left: -150px; }
+.blob-2 { width: 400px; height: 400px; background: #a5f3fc; bottom: -80px; right: -100px; animation-delay: -4s; }
+.blob-3 { width: 300px; height: 300px; background: #ddd6fe; top: 40%; left: 40%; animation-delay: -8s; }
+@keyframes blobMove {
+  0% { transform: translate(0,0) scale(1); }
+  100% { transform: translate(40px, 30px) scale(1.07); }
+}
+.hero-content {
+  max-width: 1280px; margin: 0 auto; padding: 80px 24px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+  position: relative; z-index: 1;
+}
+.hero-text { }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(37,99,235,0.1); color: var(--primary);
+  padding: 6px 16px; border-radius: 99px; font-size: 0.82rem; font-weight: 600;
+  margin-bottom: 24px; border: 1px solid rgba(37,99,235,0.2);
+}
+.hero-title {
+  font-size: 3.8rem; font-weight: 900; line-height: 1.1;
+  color: var(--gray-900); margin-bottom: 16px;
+  letter-spacing: -2px;
+}
+.hero-title span { 
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-typing-wrap {
+  font-size: 1.4rem; font-weight: 600; color: var(--primary);
+  min-height: 36px; margin-bottom: 24px;
+}
+.typing-cursor {
+  display: inline-block; width: 2px; height: 1.2em;
+  background: var(--primary); margin-left: 2px;
+  vertical-align: middle;
+  animation: blink 0.7s step-end infinite;
+}
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
+.hero-desc {
+  font-size: 1.05rem; color: var(--gray-600); max-width: 460px;
+  margin-bottom: 36px; line-height: 1.8;
+}
+.hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white; font-weight: 700; font-size: 0.95rem;
+  transition: var(--transition); position: relative; overflow: hidden;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(37,99,235,0.35); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: var(--radius-sm);
+  background: white; color: var(--primary); font-weight: 700; font-size: 0.95rem;
+  border: 2px solid var(--primary); transition: var(--transition);
+}
+.btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+.hero-stats {
+  display: flex; gap: 24px; margin-top: 48px; flex-wrap: wrap;
+}
+.hero-stat {
+  background: white; padding: 16px 20px; border-radius: var(--radius);
+  box-shadow: var(--shadow); text-align: center; min-width: 100px;
+  border: 1px solid rgba(37,99,235,0.1);
+}
+.hero-stat strong { display: block; font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.hero-stat span { font-size: 0.78rem; color: var(--gray-400); font-weight: 500; }
+.hero-visual {
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.hero-illustration {
+  width: 100%; max-width: 460px;
+  background: white; border-radius: 24px;
+  box-shadow: var(--shadow-lg);
+  padding: 32px; border: 1px solid var(--gray-200);
+  animation: floatCard 5s ease-in-out infinite;
+}
+@keyframes floatCard {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-16px); }
+}
+.illustration-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+}
+.illustration-header i { 
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.illustration-header div h3 { font-size: 1.1rem; font-weight: 700; color: var(--gray-900); }
+.illustration-header div p { font-size: 0.82rem; color: var(--gray-400); }
+.illustration-cards { display: flex; flex-direction: column; gap: 12px; }
+.illus-card {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--off-white); padding: 12px 16px; border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-200);
+}
+.illus-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; color: white; flex-shrink: 0;
+}
+.illus-icon.blue { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+.illus-icon.cyan { background: linear-gradient(135deg, #06b6d4, #0ea5e9); }
+.illus-icon.purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+.illus-card div p { font-size: 0.85rem; font-weight: 600; color: var(--gray-800); }
+.illus-card div span { font-size: 0.75rem; color: var(--gray-400); }
+.float-badge {
+  position: absolute; background: white; border-radius: 12px;
+  padding: 10px 14px; box-shadow: var(--shadow-lg);
+  font-size: 0.8rem; font-weight: 600; color: var(--gray-800);
+  display: flex; align-items: center; gap: 6px;
+  border: 1px solid var(--gray-200);
+  animation: floatCard 4s ease-in-out infinite;
+}
+.float-badge i { color: var(--success); }
+.float-badge.top-right { top: -20px; right: -20px; animation-delay: -1s; }
+.float-badge.bottom-left { bottom: -20px; left: -20px; animation-delay: -2s; }
+
+/* ==================== SECTIONS COMMON ==================== */
+.section {
+  padding: 100px 24px;
+}
+.section-inner { max-width: 1280px; margin: 0 auto; }
+.section-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(37,99,235,0.08); color: var(--primary);
+  padding: 6px 16px; border-radius: 99px; font-size: 0.8rem; font-weight: 700;
+  margin-bottom: 16px; letter-spacing: 0.05em; text-transform: uppercase;
+}
+.section-title {
+  font-size: 2.5rem; font-weight: 800; color: var(--gray-900);
+  line-height: 1.2; margin-bottom: 16px; letter-spacing: -1px;
+}
+.section-title span {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.section-desc {
+  font-size: 1rem; color: var(--gray-600); max-width: 580px; line-height: 1.8;
+  margin-bottom: 56px;
+}
+.section-header { text-align: center; }
+.section-header .section-desc { margin: 0 auto 56px; }
+
+/* ==================== ABOUT SECTION ==================== */
+#about { background: var(--white); }
+.about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+}
+.about-stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 40px;
+}
+.about-stat-card {
+  background: white; border-radius: var(--radius); padding: 24px;
+  box-shadow: var(--shadow); border: 1px solid var(--gray-200);
+  text-align: center; transition: var(--transition);
+}
+.about-stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.about-stat-card .num {
+  font-size: 2rem; font-weight: 900; color: var(--primary); display: block;
+}
+.about-stat-card .lbl { font-size: 0.82rem; color: var(--gray-400); font-weight: 500; }
+.about-text h2 { font-size: 2.2rem; font-weight: 800; color: var(--gray-900); margin-bottom: 16px; letter-spacing: -1px; }
+.about-text p { color: var(--gray-600); margin-bottom: 14px; line-height: 1.8; }
+.about-text ul { list-style: none; margin-top: 20px; }
+.about-text ul li {
+  display: flex; align-items: flex-start; gap: 10px;
+  color: var(--gray-600); margin-bottom: 10px; font-size: 0.95rem;
+}
+.about-text ul li i { color: var(--success); font-size: 1rem; margin-top: 2px; flex-shrink: 0; }
+
+/* ==================== FEATURES SECTION ==================== */
+#features { background: var(--off-white); }
+.features-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+}
+.feature-card {
+  background: white; border-radius: var(--radius); padding: 28px 22px;
+  box-shadow: var(--shadow); border: 1px solid var(--gray-200);
+  transition: var(--transition); position: relative; overflow: hidden;
+}
+.feature-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transform: scaleX(0); transform-origin: left;
+  transition: var(--transition);
+}
+.feature-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.feature-card:hover::before { transform: scaleX(1); }
+.feature-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(6,182,212,0.1));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; color: var(--primary); margin-bottom: 16px;
+  transition: var(--transition);
+}
+.feature-card:hover .feature-icon { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; }
+.feature-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+.feature-card p { font-size: 0.82rem; color: var(--gray-600); line-height: 1.6; }
+
+/* ==================== AUTH MODAL ==================== */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden; transition: var(--transition);
+  padding: 20px;
+}
+.modal-overlay.open { opacity: 1; visibility: visible; }
+.modal-box {
+  background: white; border-radius: 24px; width: 100%; max-width: 440px;
+  padding: 40px; box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+  transform: translateY(20px) scale(0.97);
+  transition: var(--transition); max-height: 90vh; overflow-y: auto;
+}
+.modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+.modal-header { text-align: center; margin-bottom: 32px; }
+.modal-header i { font-size: 2.5rem; color: var(--primary); margin-bottom: 12px; }
+.modal-header h2 { font-size: 1.5rem; font-weight: 800; color: var(--gray-900); }
+.modal-header p { color: var(--gray-600); font-size: 0.88rem; margin-top: 4px; }
+.modal-tabs {
+  display: flex; background: var(--gray-100); border-radius: var(--radius-sm);
+  padding: 4px; margin-bottom: 28px; gap: 4px;
+}
+.modal-tab {
+  flex: 1; padding: 10px; border-radius: 6px; font-weight: 600; font-size: 0.88rem;
+  background: transparent; color: var(--gray-600); transition: var(--transition);
+}
+.modal-tab.active { background: white; color: var(--primary); box-shadow: var(--shadow); }
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block; font-size: 0.82rem; font-weight: 600;
+  color: var(--gray-700); margin-bottom: 6px;
+}
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 12px 16px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--gray-200); font-size: 0.9rem;
+  color: var(--gray-800); background: var(--gray-50);
+  transition: var(--transition);
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none; border-color: var(--primary);
+  background: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+.btn-form {
+  width: 100%; padding: 14px; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white; font-weight: 700; font-size: 0.95rem;
+  transition: var(--transition); margin-top: 8px;
+}
+.btn-form:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.35); }
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--gray-100); color: var(--gray-600);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; transition: var(--transition);
+}
+.modal-close:hover { background: var(--danger); color: white; }
+.modal-box { position: relative; }
+.form-error { font-size: 0.8rem; color: var(--danger); margin-top: 4px; display: none; }
+.form-error.show { display: block; }
+
+/* ==================== UPLOAD SECTION ==================== */
+#upload { background: white; }
+.upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+.upload-form-card {
+  background: var(--off-white); border-radius: 24px;
+  padding: 36px; border: 1px solid var(--gray-200);
+}
+.upload-form-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 24px; color: var(--gray-900); }
+.upload-drop-zone {
+  border: 2px dashed var(--gray-200); border-radius: var(--radius);
+  padding: 40px; text-align: center; cursor: pointer;
+  transition: var(--transition); background: white; margin-bottom: 20px;
+}
+.upload-drop-zone:hover, .upload-drop-zone.drag-over {
+  border-color: var(--primary); background: rgba(37,99,235,0.03);
+}
+.upload-drop-zone i { font-size: 2.5rem; color: var(--gray-400); margin-bottom: 12px; display: block; }
+.upload-drop-zone p { font-size: 0.88rem; color: var(--gray-600); }
+.upload-drop-zone span { font-size: 0.8rem; color: var(--gray-400); }
+.upload-file-preview {
+  background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.15);
+  border-radius: var(--radius-sm); padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  display: none;
+}
+.upload-file-preview.show { display: flex; }
+.upload-file-preview i { color: var(--primary); }
+.upload-file-preview span { font-size: 0.85rem; color: var(--gray-700); flex: 1; }
+.upload-benefits { }
+.upload-benefits h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; color: var(--gray-900); }
+.benefit-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: white; border-radius: var(--radius); padding: 18px 20px;
+  margin-bottom: 14px; border: 1px solid var(--gray-200); box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+.benefit-item:hover { transform: translateX(4px); border-color: var(--primary); }
+.benefit-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 1.1rem; flex-shrink: 0;
+}
+.benefit-item h4 { font-size: 0.9rem; font-weight: 700; color: var(--gray-900); margin-bottom: 2px; }
+.benefit-item p { font-size: 0.8rem; color: var(--gray-600); }
+
+/* ==================== LIBRARY SECTION ==================== */
+#library { background: var(--off-white); }
+.library-search {
+  background: white; border-radius: var(--radius); padding: 24px;
+  box-shadow: var(--shadow); margin-bottom: 32px;
+  display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px;
+  border: 1px solid var(--gray-200);
+}
+.library-search input, .library-search select {
+  padding: 10px 14px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--gray-200); font-size: 0.88rem;
+  background: var(--gray-50); color: var(--gray-800); transition: var(--transition);
+}
+.library-search input:focus, .library-search select:focus {
+  outline: none; border-color: var(--primary); background: white;
+}
+.library-search button {
+  padding: 10px 20px; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white; font-weight: 600; font-size: 0.88rem;
+  transition: var(--transition);
+}
+.library-search button:hover { transform: translateY(-1px); }
+.resources-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.resource-card {
+  background: white; border-radius: var(--radius); padding: 24px;
+  box-shadow: var(--shadow); border: 1px solid var(--gray-200);
+  transition: var(--transition); display: flex; flex-direction: column; gap: 14px;
+}
+.resource-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.resource-type-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 700;
+}
+.type-notes { background: rgba(37,99,235,0.1); color: var(--primary); }
+.type-book { background: rgba(139,92,246,0.1); color: var(--accent2); }
+.type-qp { background: rgba(245,158,11,0.1); color: var(--warning); }
+.resource-title { font-size: 1rem; font-weight: 700; color: var(--gray-900); }
+.resource-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+.resource-meta span {
+  font-size: 0.78rem; color: var(--gray-600);
+  display: flex; align-items: center; gap: 4px;
+}
+.resource-meta span i { color: var(--gray-400); }
+.resource-desc { font-size: 0.83rem; color: var(--gray-600); line-height: 1.6; flex: 1; }
+.resource-uploader {
+  display: flex; align-items: center; gap: 8px;
+  padding-top: 12px; border-top: 1px solid var(--gray-100);
+}
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+}
+.resource-uploader span { font-size: 0.8rem; color: var(--gray-600); }
+.resource-stars { display: flex; gap: 3px; margin-left: auto; }
+.resource-stars i { font-size: 0.75rem; color: var(--gray-300); cursor: pointer; transition: var(--transition); }
+.resource-stars i.filled, .resource-stars i:hover ~ i { }
+.resource-stars i.filled { color: var(--warning); }
+.resource-actions { display: flex; gap: 8px; }
+.btn-view, .btn-download, .btn-save {
+  flex: 1; padding: 9px; border-radius: var(--radius-sm);
+  font-size: 0.78rem; font-weight: 600; transition: var(--transition);
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.btn-view { background: rgba(37,99,235,0.08); color: var(--primary); }
+.btn-view:hover { background: var(--primary); color: white; }
+.btn-download { background: rgba(16,185,129,0.08); color: var(--success); }
+.btn-download:hover { background: var(--success); color: white; }
+.btn-save { background: rgba(139,92,246,0.08); color: var(--accent2); }
+.btn-save:hover { background: var(--accent2); color: white; }
+.download-count { font-size: 0.75rem; color: var(--gray-400); display: flex; align-items: center; gap: 4px; }
+.empty-library {
+  grid-column: 1/-1; text-align: center; padding: 60px;
+  color: var(--gray-400);
+}
+.empty-library i { font-size: 3rem; margin-bottom: 16px; display: block; }
+.empty-library p { font-size: 1rem; }
+
+/* ==================== VIEW MODAL ==================== */
+#viewModal .modal-box { max-width: 560px; }
+.view-detail-row {
+  display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px;
+}
+.view-detail-row strong { min-width: 120px; font-size: 0.85rem; color: var(--gray-600); }
+.view-detail-row span { font-size: 0.85rem; color: var(--gray-800); }
+.view-separator { border: none; border-top: 1px solid var(--gray-200); margin: 16px 0; }
+
+/* ==================== CATEGORIES SECTION ==================== */
+#categories { background: white; }
+.categories-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.category-card {
+  border-radius: var(--radius); padding: 28px 20px; text-align: center;
+  cursor: pointer; transition: var(--transition);
+  border: 2px solid transparent;
+  background: var(--off-white);
+  position: relative; overflow: hidden;
+}
+.category-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  opacity: 0; transition: var(--transition);
+}
+.category-card:hover { transform: translateY(-6px); border-color: var(--primary); box-shadow: var(--shadow-lg); }
+.category-card:hover::before { opacity: 0.06; }
+.category-card:hover .category-icon { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; }
+.category-icon {
+  width: 60px; height: 60px; border-radius: 18px;
+  background: rgba(37,99,235,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; color: var(--primary); margin: 0 auto 16px;
+  transition: var(--transition);
+}
+.category-card h3 { font-size: 0.9rem; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+.category-card span { font-size: 0.78rem; color: var(--gray-400); }
+
+/* ==================== DASHBOARD SECTION ==================== */
+#dashboard { background: var(--off-white); }
+.dashboard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
+.dash-card {
+  background: white; border-radius: var(--radius); padding: 24px;
+  box-shadow: var(--shadow); border: 1px solid var(--gray-200);
+  transition: var(--transition);
+}
+.dash-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.dash-card-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+}
+.dash-card-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; color: white;
+}
+.icon-blue { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+.icon-cyan { background: linear-gradient(135deg, #06b6d4, #0ea5e9); }
+.icon-purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+.icon-green { background: linear-gradient(135deg, #10b981, #34d399); }
+.icon-orange { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+.dash-trend {
+  font-size: 0.75rem; font-weight: 600;
+  display: flex; align-items: center; gap: 3px;
+}
+.dash-trend.up { color: var(--success); }
+.dash-trend.down { color: var(--danger); }
+.dash-num { font-size: 2rem; font-weight: 900; color: var(--gray-900); }
+.dash-label { font-size: 0.82rem; color: var(--gray-400); margin-top: 4px; }
+.progress-bar-wrap {
+  margin-top: 12px; height: 4px; background: var(--gray-100); border-radius: 99px; overflow: hidden;
+}
+.progress-bar {
+  height: 100%; border-radius: 99px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transition: width 1.5s cubic-bezier(.4,0,.2,1);
+}
+.dashboard-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.dash-table-card {
+  background: white; border-radius: var(--radius); padding: 24px;
+  box-shadow: var(--shadow); border: 1px solid var(--gray-200);
+}
+.dash-table-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--gray-900); margin-bottom: 16px; }
+.dash-table-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid var(--gray-100);
+  font-size: 0.82rem;
+}
+.dash-table-row:last-child { border-bottom: none; }
+.dash-table-row .name { color: var(--gray-800); font-weight: 500; flex: 1; }
+.dash-table-row .val { color: var(--primary); font-weight: 700; }
+.dash-table-row .type { color: var(--gray-400); font-size: 0.75rem; margin-left: 8px; }
+
+/* ==================== SDG SECTION ==================== */
+#sdg { background: linear-gradient(160deg, #1e40af 0%, #2563eb 50%, #0891b2 100%); color: white; }
+#sdg .section-label { background: rgba(255,255,255,0.15); color: white; }
+#sdg .section-title { color: white; }
+#sdg .section-title span { -webkit-text-fill-color: #bfdbfe; }
+#sdg .section-desc { color: rgba(255,255,255,0.75); margin: 0 auto 56px; }
+.sdg-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.sdg-card {
+  background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+  border-radius: var(--radius); padding: 28px 20px; text-align: center;
+  border: 1px solid rgba(255,255,255,0.2); transition: var(--transition);
+}
+.sdg-card:hover { background: rgba(255,255,255,0.18); transform: translateY(-4px); }
+.sdg-card .icon { font-size: 2.5rem; margin-bottom: 14px; }
+.sdg-card .num { font-size: 2rem; font-weight: 900; color: white; margin-bottom: 4px; }
+.sdg-card .lbl { font-size: 0.82rem; color: rgba(255,255,255,0.75); }
+.sdg-goals { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 40px; }
+.sdg-goal {
+  background: rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 16px 18px;
+  display: flex; align-items: flex-start; gap: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.sdg-goal i { color: #bfdbfe; font-size: 1.1rem; margin-top: 2px; }
+.sdg-goal p { font-size: 0.85rem; color: rgba(255,255,255,0.85); line-height: 1.6; }
+
+/* ==================== CONTACT SECTION ==================== */
+#contact { background: white; }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+.contact-info h3 { font-size: 1.4rem; font-weight: 700; color: var(--gray-900); margin-bottom: 12px; }
+.contact-info p { color: var(--gray-600); margin-bottom: 28px; line-height: 1.8; }
+.contact-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  margin-bottom: 18px;
+}
+.contact-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(6,182,212,0.1));
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary); font-size: 1.1rem; flex-shrink: 0;
+}
+.contact-item h4 { font-size: 0.88rem; font-weight: 700; color: var(--gray-900); }
+.contact-item p { font-size: 0.82rem; color: var(--gray-600); margin: 0; }
+.contact-form-card {
+  background: var(--off-white); border-radius: 24px; padding: 36px;
+  border: 1px solid var(--gray-200);
+}
+.contact-form-card textarea {
+  resize: vertical; min-height: 120px;
+}
+
+/* ==================== TOAST NOTIFICATION ==================== */
+#toast-container {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9998;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+  background: white; border-radius: 12px; padding: 14px 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px;
+  min-width: 280px; max-width: 360px;
+  animation: toastIn 0.3s cubic-bezier(.4,0,.2,1);
+  border-left: 4px solid var(--primary);
+}
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+.toast.warning { border-left-color: var(--warning); }
+.toast i { font-size: 1.1rem; }
+.toast.success i { color: var(--success); }
+.toast.error i { color: var(--danger); }
+.toast.warning i { color: var(--warning); }
+.toast p { font-size: 0.85rem; color: var(--gray-800); font-weight: 500; flex: 1; }
+@keyframes toastIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ==================== SCROLL TO TOP ==================== */
+#scroll-top {
+  position: fixed; bottom: 24px; left: 24px; z-index: 998;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-lg); opacity: 0; visibility: hidden;
+  transition: var(--transition); cursor: pointer;
+}
+#scroll-top.visible { opacity: 1; visibility: visible; }
+#scroll-top:hover { transform: translateY(-2px); }
+
+/* ==================== FOOTER ==================== */
+footer {
+  background: var(--gray-900); color: white;
+  padding: 60px 24px 24px;
+}
+.footer-inner { max-width: 1280px; margin: 0 auto; }
+.footer-grid {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+  margin-bottom: 48px;
+}
+.footer-brand { }
+.footer-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 800; font-size: 1.3rem; color: white; margin-bottom: 14px;
+}
+.footer-logo i { color: #60a5fa; }
+.footer-brand p { font-size: 0.88rem; color: #9ca3af; line-height: 1.8; max-width: 280px; margin-bottom: 20px; }
+.footer-socials { display: flex; gap: 10px; }
+.footer-social {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: rgba(255,255,255,0.08); color: #9ca3af;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; transition: var(--transition);
+}
+.footer-social:hover { background: var(--primary); color: white; }
+.footer-col h4 { font-size: 0.88rem; font-weight: 700; color: white; margin-bottom: 16px; }
+.footer-col ul { list-style: none; }
+.footer-col ul li { margin-bottom: 10px; }
+.footer-col ul li a { font-size: 0.82rem; color: #9ca3af; transition: var(--transition); }
+.footer-col ul li a:hover { color: #60a5fa; }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 24px; display: flex; align-items: center; justify-content: space-between;
+}
+.footer-bottom p { font-size: 0.82rem; color: #9ca3af; }
+.footer-bottom span { color: var(--danger); }
+
+/* ==================== SCROLL ANIMATIONS ==================== */
+.fade-in {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+.fade-in-left {
+  opacity: 0; transform: translateX(-24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in-left.visible { opacity: 1; transform: translateX(0); }
+.fade-in-right {
+  opacity: 0; transform: translateX(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-in-right.visible { opacity: 1; transform: translateX(0); }
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .features-grid { grid-template-columns: repeat(3, 1fr); }
+  .hero-content { grid-template-columns: 1fr; text-align: center; gap: 40px; }
+  .hero-visual { order: -1; }
+  .hero-desc { margin: 0 auto 36px; }
+  .hero-btns { justify-content: center; }
+  .hero-stats { justify-content: center; }
+  .about-grid { grid-template-columns: 1fr; }
+  .upload-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .categories-grid { grid-template-columns: repeat(4, 1fr); }
+  .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+  .dashboard-tables { grid-template-columns: 1fr; }
+  .sdg-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+}
+@media (max-width: 768px) {
+  .nav-links, .nav-auth { display: none; }
+  .nav-hamburger { display: flex; }
+  .hero-title { font-size: 2.6rem; }
+  .section-title { font-size: 1.9rem; }
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .categories-grid { grid-template-columns: repeat(2, 1fr); }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .resources-grid { grid-template-columns: 1fr; }
+  .library-search { grid-template-columns: 1fr 1fr; }
+  .library-search button { grid-column: 1/-1; }
+  .sdg-goals { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+  .section { padding: 70px 20px; }
+}
+@media (max-width: 480px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .categories-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-title { font-size: 2rem; }
+  .sdg-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ==================== USER WELCOME BAR ==================== */
+#user-bar {
+  display: none;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  color: white; padding: 10px 24px;
+  align-items: center; justify-content: space-between;
+  font-size: 0.88rem; font-weight: 500;
+}
+#user-bar.show { display: flex; }
+#user-bar span { display: flex; align-items: center; gap: 8px; }
+#user-bar button {
+  background: rgba(255,255,255,0.2); color: white;
+  padding: 6px 16px; border-radius: 6px; font-size: 0.82rem; font-weight: 600;
+  transition: var(--transition);
+}
+#user-bar button:hover { background: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+
+<!-- ==================== LOADING SCREEN ==================== -->
+<div id="loading-screen">
+  <div class="loading-logo">
+    <i class="fas fa-book-open"></i>
+    <h1>StudyShare</h1>
+    <p>Share Knowledge, Empower Learning</p>
+  </div>
+  <div class="loading-bar-wrap">
+    <div class="loading-bar" id="loading-bar"></div>
+  </div>
+  <div class="loading-pct" id="loading-pct">0%</div>
+</div>
+
+<!-- ==================== USER WELCOME BAR ==================== -->
+<div id="user-bar">
+  <span><i class="fas fa-user-circle"></i> Welcome back, <strong id="user-name-display">Student</strong>!</span>
+  <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+</div>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#home" class="nav-logo">
+      <i class="fas fa-book-open"></i> StudyShare
+    </a>
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#upload">Upload</a></li>
+      <li><a href="#library">Library</a></li>
+      <li><a href="#categories">Categories</a></li>
+      <li><a href="#dashboard">Dashboard</a></li>
+      <li><a href="#sdg">SDG Impact</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-auth" id="nav-auth">
+      <button class="btn-login" onclick="openModal('login')">Login</button>
+      <button class="btn-signup" onclick="openModal('register')">Sign Up</button>
+    </div>
+    <button class="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#home" onclick="closeMobileMenu()">Home</a>
+  <a href="#about" onclick="closeMobileMenu()">About</a>
+  <a href="#features" onclick="closeMobileMenu()">Features</a>
+  <a href="#upload" onclick="closeMobileMenu()">Upload Resource</a>
+  <a href="#library" onclick="closeMobileMenu()">Library</a>
+  <a href="#categories" onclick="closeMobileMenu()">Categories</a>
+  <a href="#dashboard" onclick="closeMobileMenu()">Dashboard</a>
+  <a href="#sdg" onclick="closeMobileMenu()">SDG Impact</a>
+  <a href="#contact" onclick="closeMobileMenu()">Contact</a>
+  <div class="mobile-menu-auth">
+    <button class="btn-login" onclick="openModal('login'); closeMobileMenu()">Login</button>
+    <button class="btn-signup" onclick="openModal('register'); closeMobileMenu()">Sign Up</button>
+  </div>
+</div>
+
+<!-- ==================== HERO SECTION ==================== -->
+<section id="home">
+  <div class="hero-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-text">
+      <div class="hero-badge"><i class="fas fa-graduation-cap"></i> SDG 4 – Quality Education</div>
+      <h1 class="hero-title">
+        <span>StudyShare</span>
+      </h1>
+      <div class="hero-typing-wrap">
+        <span id="typing-text"></span><span class="typing-cursor"></span>
+      </div>
+      <p class="hero-desc">
+        A free platform where students upload, share, and discover notes, books, and question papers.
+        Break the barrier of educational inequality — together.
+      </p>
+      <div class="hero-btns">
+        <a href="#upload" class="btn-primary"><i class="fas fa-upload"></i> Upload Resource</a>
+        <a href="#library" class="btn-secondary"><i class="fas fa-search"></i> Explore Library</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <strong class="counter" data-target="5000">0</strong>
+          <span>Notes Shared</span>
+        </div>
+        <div class="hero-stat">
+          <strong class="counter" data-target="2000">0</strong>
+          <span>Books</span>
+        </div>
+        <div class="hero-stat">
+          <strong class="counter" data-target="10000">0</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="hero-stat">
+          <strong class="counter" data-target="3000">0</strong>
+          <span>Students</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="float-badge top-right">
+        <i class="fas fa-check-circle"></i> Free Forever
+      </div>
+      <div class="hero-illustration">
+        <div class="illustration-header">
+          <i class="fas fa-book-open"></i>
+          <div>
+            <h3>Resource Library</h3>
+            <p>Thousands of study materials</p>
+          </div>
+        </div>
+        <div class="illustration-cards">
+          <div class="illus-card">
+            <div class="illus-icon blue"><i class="fas fa-file-alt"></i></div>
+            <div>
+              <p>Data Structures Notes</p>
+              <span>Computer Engineering · Sem 4</span>
+            </div>
+          </div>
+          <div class="illus-card">
+            <div class="illus-icon cyan"><i class="fas fa-book"></i></div>
+            <div>
+              <p>Engineering Mathematics</p>
+              <span>All Branches · Sem 1</span>
+            </div>
+          </div>
+          <div class="illus-card">
+            <div class="illus-icon purple"><i class="fas fa-question-circle"></i></div>
+            <div>
+              <p>Previous Year Papers 2023</p>
+              <span>Civil Engineering · Sem 6</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="float-badge bottom-left">
+        <i class="fas fa-download"></i> 127 downloads today
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== ABOUT SECTION ==================== -->
+<section id="about" class="section">
+  <div class="section-inner">
+    <div class="about-grid">
+      <div class="about-text fade-in-left">
+        <div class="section-label"><i class="fas fa-info-circle"></i> About StudyShare</div>
+        <h2>Bridging the <span style="color:var(--primary)">Educational Gap</span></h2>
+        <p>
+          Many students struggle to access essential study materials — notes, books, and question papers — due to their
+          high cost or limited availability. After completing courses, countless valuable resources are simply discarded.
+        </p>
+        <p>
+          StudyShare solves this problem by creating a collaborative ecosystem where students freely share and
+          access educational content, directly contributing to UN Sustainable Development Goal 4: Quality Education.
+        </p>
+        <ul>
+          <li><i class="fas fa-check-circle"></i> Free access to thousands of curated study resources</li>
+          <li><i class="fas fa-check-circle"></i> Upload and share your own notes, books & papers</li>
+          <li><i class="fas fa-check-circle"></i> Organized by subject, course, and semester</li>
+          <li><i class="fas fa-check-circle"></i> Serving school, college & university students</li>
+          <li><i class="fas fa-check-circle"></i> Aligned with SDG 4 – Quality Education</li>
+        </ul>
+      </div>
+      <div class="fade-in-right">
+        <div class="about-stats-grid">
+          <div class="about-stat-card">
+            <span class="num counter" data-target="5000">0</span>
+            <span class="lbl">Notes Shared</span>
+          </div>
+          <div class="about-stat-card">
+            <span class="num counter" data-target="2000">0</span>
+            <span class="lbl">Books Available</span>
+          </div>
+          <div class="about-stat-card">
+            <span class="num counter" data-target="10000">0</span>
+            <span class="lbl">Total Downloads</span>
+          </div>
+          <div class="about-stat-card">
+            <span class="num counter" data-target="3000">0</span>
+            <span class="lbl">Active Students</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FEATURES SECTION ==================== -->
+<section id="features" class="section">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <div class="section-label"><i class="fas fa-star"></i> Features</div>
+      <h2 class="section-title">Everything You Need to <span>Learn & Share</span></h2>
+      <p class="section-desc">A complete educational platform built for students, by students.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card fade-in" style="transition-delay:0.05s">
+        <div class="feature-icon"><i class="fas fa-lock"></i></div>
+        <h3>Secure Student Login</h3>
+        <p>Safe registration and login with session management stored locally.</p>
+      </div>
+      <div class="feature-card fade-in" style="transition-delay:0.1s">
+        <div class="feature-icon"><i class="fas fa-file-alt"></i></div>
+        <h3>Upload Notes</h3>
+        <p>Share your handwritten or digital notes with subject and semester tags.</p>
+      </div>
+      <div class="feature-card fade-in" style="transition-delay:0.15s">
+        <div class="feature-icon"><i class="fas fa-book"></i></div>
+        <h3>Upload Books</h3>
+        <p>Contribute textbooks and reference materials for all branches.</p>
+      </div>
+      <div class="feature-card fade-in" style="transition-delay:0.2s">
+        <div class="feature-icon"><i class="fas fa-question-circle"></i></div>
+        <h3>Upload Question Papers</h3>
+        <p>Share previous year exam papers to help students prepare effectively.</p>
+      </div>
+      <div class="feature-card fade-in" style="transition-delay:0.25s">
+        <div class="feature-icon"><i class="fas fa-search"></i></div>
+        <h3>Smart Search</h3>
+        <p>Filter resources by subject, course, semester, and type instantly.</p>
+      </div>
+      <div class="feature-card fade-in" style="transition-delay:0.3s">
+        <div class="feature-icon"><i class="fas fa-eye"></i></div>
+        <h3>Online Reading</h3>
+        <p>Preview resource details directly in the browser without downloading.</p>
+      </div>
+      <div class="feature-card fade-in" style="transition-delay:0.35s">
+        <div class="feature-icon"><i class="fas fa-download"></i></div>
+        <h3>Free Downloads</h3>
+        <p>Download any resource completely free with a single click.</p>
+      </div>
+      <div class="feature-card fade-in" style="transition-delay:0.4s">
+        <div class="feature-icon"><i class="fas fa-folder-open"></i></div>
+        <h3>Organized Categories</h3>
+        <p>Resources sorted by engineering branch, science, commerce & arts.</p>
+      </div>
+      <div class="feature-card fade-in" style="transition-delay:0.45s">
+        <div class="feature-icon"><i class="fas fa-tachometer-alt"></i></div>
+        <h3>Student Dashboard</h3>
+        <p>Track your uploads, downloads, and saved resources in one place.</p>
+      </div>
+      <div class="feature-card fade-in" style="transition-delay:0.5s">
+        <div class="feature-icon"><i class="fas fa-fire"></i></div>
+        <h3>Popular Resources</h3>
+        <p>Discover the most downloaded and trending study materials.</p>
+      </div>
+      <div class="feature-card fade-in" style="transition-delay:0.55s">
+        <div class="feature-icon"><i class="fas fa-star"></i></div>
+        <h3>Resource Ratings</h3>
+        <p>Rate and review resources to help others find the best materials.</p>
+      </div>
+      <div class="feature-card fade-in" style="transition-delay:0.6s">
+        <div class="feature-icon"><i class="fas fa-globe"></i></div>
+        <h3>SDG Impact Tracker</h3>
+        <p>See the real-world educational impact your sharing creates.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== UPLOAD SECTION ==================== -->
+<section id="upload" class="section">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <div class="section-label"><i class="fas fa-upload"></i> Share Resources</div>
+      <h2 class="section-title">Upload Your <span>Study Materials</span></h2>
+      <p class="section-desc">Help fellow students by sharing what you know. Every upload makes a difference.</p>
+    </div>
+    <div class="upload-grid">
+      <div class="upload-form-card fade-in-left">
+        <h3><i class="fas fa-upload" style="color:var(--primary);margin-right:8px"></i> Upload Resource</h3>
+        <form id="upload-form" onsubmit="handleUpload(event)">
+          <div class="form-group">
+            <label>Resource Title *</label>
+            <input type="text" id="res-title" placeholder="e.g. Data Structures Complete Notes" required />
+          </div>
+          <div class="form-group">
+            <label>Subject *</label>
+            <input type="text" id="res-subject" placeholder="e.g. Data Structures" required />
+          </div>
+          <div class="form-group">
+            <label>Course / Branch *</label>
+            <select id="res-course" required>
+              <option value="">Select Course</option>
+              <option>Computer Engineering</option>
+              <option>Information Technology</option>
+              <option>Mechanical Engineering</option>
+              <option>Civil Engineering</option>
+              <option>Electronics Engineering</option>
+              <option>Science</option>
+              <option>Commerce</option>
+              <option>Arts</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Semester</label>
+            <select id="res-sem">
+              <option value="">Select Semester</option>
+              <option>Semester 1</option><option>Semester 2</option>
+              <option>Semester 3</option><option>Semester 4</option>
+              <option>Semester 5</option><option>Semester 6</option>
+              <option>Semester 7</option><option>Semester 8</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Resource Type *</label>
+            <select id="res-type" required>
+              <option value="">Select Type</option>
+              <option>Notes</option>
+              <option>Book</option>
+              <option>Question Paper</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="res-desc" rows="3" placeholder="Brief description of this resource..."></textarea>
+          </div>
+          <div class="upload-drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Click to select PDF file</p>
+            <span>or drag and drop here</span>
+          </div>
+          <input type="file" id="file-input" accept=".pdf" style="display:none" onchange="handleFileSelect(this)" />
+          <div class="upload-file-preview" id="file-preview">
+            <i class="fas fa-file-pdf"></i>
+            <span id="file-name"></span>
+            <i class="fas fa-times" style="cursor:pointer;color:var(--danger)" onclick="removeFile()"></i>
+          </div>
+          <button type="submit" class="btn-form">
+            <i class="fas fa-upload"></i> Upload Resource
+          </button>
+        </form>
+      </div>
+      <div class="upload-benefits fade-in-right">
+        <h3>Why Share on StudyShare?</h3>
+        <div class="benefit-item">
+          <div class="benefit-icon"><i class="fas fa-heart"></i></div>
+          <div>
+            <h4>Help Fellow Students</h4>
+            <p>Your notes could be exactly what another student needs to pass their exam.</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon"><i class="fas fa-globe-asia"></i></div>
+          <div>
+            <h4>Create SDG Impact</h4>
+            <p>Every upload contributes to UN Goal 4: Quality Education for all.</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon"><i class="fas fa-infinity"></i></div>
+          <div>
+            <h4>Forever Free</h4>
+            <p>All resources remain free. No subscriptions, no hidden costs, ever.</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon"><i class="fas fa-chart-line"></i></div>
+          <div>
+            <h4>Track Your Impact</h4>
+            <p>See how many students have downloaded and benefited from your uploads.</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon"><i class="fas fa-users"></i></div>
+          <div>
+            <h4>Join the Community</h4>
+            <p>Be part of a growing network of 3,000+ students sharing knowledge.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== LIBRARY SECTION ==================== -->
+<section id="library" class="section">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <div class="section-label"><i class="fas fa-books"></i> Resource Library</div>
+      <h2 class="section-title">Find Your <span>Study Materials</span></h2>
+      <p class="section-desc">Browse thousands of free resources uploaded by students like you.</p>
+    </div>
+    <div class="library-search fade-in">
+      <input type="text" id="search-q" placeholder="🔍 Search by title or subject..." oninput="renderLibrary()" />
+      <select id="filter-course" onchange="renderLibrary()">
+        <option value="">All Courses</option>
+        <option>Computer Engineering</option>
+        <option>Information Technology</option>
+        <option>Mechanical Engineering</option>
+        <option>Civil Engineering</option>
+        <option>Electronics Engineering</option>
+        <option>Science</option>
+        <option>Commerce</option>
+        <option>Arts</option>
+      </select>
+      <select id="filter-sem" onchange="renderLibrary()">
+        <option value="">All Semesters</option>
+        <option>Semester 1</option><option>Semester 2</option>
+        <option>Semester 3</option><option>Semester 4</option>
+        <option>Semester 5</option><option>Semester 6</option>
+        <option>Semester 7</option><option>Semester 8</option>
+      </select>
+      <select id="filter-type" onchange="renderLibrary()">
+        <option value="">All Types</option>
+        <option>Notes</option>
+        <option>Book</option>
+        <option>Question Paper</option>
+      </select>
+      <button onclick="renderLibrary()"><i class="fas fa-search"></i> Search</button>
+    </div>
+    <div class="resources-grid" id="resources-grid">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CATEGORIES SECTION ==================== -->
+<section id="categories" class="section">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <div class="section-label"><i class="fas fa-th-large"></i> Categories</div>
+      <h2 class="section-title">Browse by <span>Branch</span></h2>
+      <p class="section-desc">Click any category to instantly filter resources for that field of study.</p>
+    </div>
+    <div class="categories-grid">
+      <div class="category-card fade-in" onclick="filterByCategory('Computer Engineering')">
+        <div class="category-icon"><i class="fas fa-laptop-code"></i></div>
+        <h3>Computer Engineering</h3>
+        <span>Notes · Books · Papers</span>
+      </div>
+      <div class="category-card fade-in" style="transition-delay:0.05s" onclick="filterByCategory('Information Technology')">
+        <div class="category-icon"><i class="fas fa-network-wired"></i></div>
+        <h3>Information Technology</h3>
+        <span>Notes · Books · Papers</span>
+      </div>
+      <div class="category-card fade-in" style="transition-delay:0.1s" onclick="filterByCategory('Mechanical Engineering')">
+        <div class="category-icon"><i class="fas fa-cogs"></i></div>
+        <h3>Mechanical Engineering</h3>
+        <span>Notes · Books · Papers</span>
+      </div>
+      <div class="category-card fade-in" style="transition-delay:0.15s" onclick="filterByCategory('Civil Engineering')">
+        <div class="category-icon"><i class="fas fa-hard-hat"></i></div>
+        <h3>Civil Engineering</h3>
+        <span>Notes · Books · Papers</span>
+      </div>
+      <div class="category-card fade-in" style="transition-delay:0.2s" onclick="filterByCategory('Electronics Engineering')">
+        <div class="category-icon"><i class="fas fa-microchip"></i></div>
+        <h3>Electronics Engineering</h3>
+        <span>Notes · Books · Papers</span>
+      </div>
+      <div class="category-card fade-in" style="transition-delay:0.25s" onclick="filterByCategory('Science')">
+        <div class="category-icon"><i class="fas fa-flask"></i></div>
+        <h3>Science</h3>
+        <span>Notes · Books · Papers</span>
+      </div>
+      <div class="category-card fade-in" style="transition-delay:0.3s" onclick="filterByCategory('Commerce')">
+        <div class="category-icon"><i class="fas fa-chart-bar"></i></div>
+        <h3>Commerce</h3>
+        <span>Notes · Books · Papers</span>
+      </div>
+      <div class="category-card fade-in" style="transition-delay:0.35s" onclick="filterByCategory('Arts')">
+        <div class="category-icon"><i class="fas fa-paint-brush"></i></div>
+        <h3>Arts</h3>
+        <span>Notes · Books · Papers</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DASHBOARD SECTION ==================== -->
+<section id="dashboard" class="section">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <div class="section-label"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+      <h2 class="section-title">Platform <span>Statistics</span></h2>
+      <p class="section-desc">Live metrics of our growing educational community.</p>
+    </div>
+    <div class="dashboard-grid">
+      <div class="dash-card fade-in">
+        <div class="dash-card-header">
+          <div class="dash-card-icon icon-blue"><i class="fas fa-file-alt"></i></div>
+          <span class="dash-trend up"><i class="fas fa-arrow-up"></i> 12%</span>
+        </div>
+        <div class="dash-num" id="dash-uploads">0</div>
+        <div class="dash-label">Total Resources Uploaded</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" data-width="72"></div></div>
+      </div>
+      <div class="dash-card fade-in" style="transition-delay:0.1s">
+        <div class="dash-card-header">
+          <div class="dash-card-icon icon-cyan"><i class="fas fa-download"></i></div>
+          <span class="dash-trend up"><i class="fas fa-arrow-up"></i> 24%</span>
+        </div>
+        <div class="dash-num" id="dash-downloads">0</div>
+        <div class="dash-label">Total Downloads</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" data-width="88"></div></div>
+      </div>
+      <div class="dash-card fade-in" style="transition-delay:0.2s">
+        <div class="dash-card-header">
+          <div class="dash-card-icon icon-purple"><i class="fas fa-bookmark"></i></div>
+          <span class="dash-trend up"><i class="fas fa-arrow-up"></i> 8%</span>
+        </div>
+        <div class="dash-num" id="dash-saved">0</div>
+        <div class="dash-label">Resources Saved Offline</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" data-width="45"></div></div>
+      </div>
+      <div class="dash-card fade-in" style="transition-delay:0.3s">
+        <div class="dash-card-header">
+          <div class="dash-card-icon icon-green"><i class="fas fa-users"></i></div>
+          <span class="dash-trend up"><i class="fas fa-arrow-up"></i> 18%</span>
+        </div>
+        <div class="dash-num counter" data-target="3000">0</div>
+        <div class="dash-label">Active Students</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" data-width="60"></div></div>
+      </div>
+    </div>
+    <div class="dashboard-tables fade-in">
+      <div class="dash-table-card">
+        <h3><i class="fas fa-fire" style="color:var(--danger);margin-right:8px"></i> Most Downloaded</h3>
+        <div id="popular-list">
+          <div class="dash-table-row"><span class="name" style="color:var(--gray-400)">No resources yet. Upload one!</span></div>
+        </div>
+      </div>
+      <div class="dash-table-card">
+        <h3><i class="fas fa-clock" style="color:var(--primary);margin-right:8px"></i> Recently Uploaded</h3>
+        <div id="recent-list">
+          <div class="dash-table-row"><span class="name" style="color:var(--gray-400)">No resources yet. Be the first!</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SDG SECTION ==================== -->
+<section id="sdg" class="section">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <div class="section-label"><i class="fas fa-globe"></i> SDG 4 – Quality Education</div>
+      <h2 class="section-title">Our <span style="-webkit-text-fill-color:#bfdbfe">Real-World Impact</span></h2>
+      <p class="section-desc">
+        StudyShare directly addresses UN Sustainable Development Goal 4 by ensuring inclusive, equitable
+        quality education and promoting lifelong learning opportunities for all.
+      </p>
+    </div>
+    <div class="sdg-grid">
+      <div class="sdg-card fade-in">
+        <div class="icon">📚</div>
+        <div class="num counter" data-target="7000">0</div>
+        <div class="lbl">Resources Shared</div>
+      </div>
+      <div class="sdg-card fade-in" style="transition-delay:0.1s">
+        <div class="icon">👩‍🎓</div>
+        <div class="num counter" data-target="3000">0</div>
+        <div class="lbl">Students Helped</div>
+      </div>
+      <div class="sdg-card fade-in" style="transition-delay:0.2s">
+        <div class="icon">💰</div>
+        <div class="num" id="money-saved">₹0</div>
+        <div class="lbl">Est. Money Saved</div>
+      </div>
+      <div class="sdg-card fade-in" style="transition-delay:0.3s">
+        <div class="icon">🌍</div>
+        <div class="num counter" data-target="15">0</div>
+        <div class="lbl">Cities Reached</div>
+      </div>
+    </div>
+    <div class="sdg-goals fade-in">
+      <div class="sdg-goal">
+        <i class="fas fa-check-circle"></i>
+        <p><strong>Target 4.1:</strong> Free, equitable, and quality primary and secondary education for all boys and girls.</p>
+      </div>
+      <div class="sdg-goal">
+        <i class="fas fa-check-circle"></i>
+        <p><strong>Target 4.3:</strong> Equal access for all women and men to affordable technical, vocational, and tertiary education.</p>
+      </div>
+      <div class="sdg-goal">
+        <i class="fas fa-check-circle"></i>
+        <p><strong>Target 4.4:</strong> Increase in youth and adults with relevant skills, including technical and vocational skills.</p>
+      </div>
+      <div class="sdg-goal">
+        <i class="fas fa-check-circle"></i>
+        <p><strong>Target 4.7:</strong> Education for sustainable development and global citizenship through shared knowledge.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CONTACT SECTION ==================== -->
+<section id="contact" class="section">
+  <div class="section-inner">
+    <div class="section-header fade-in">
+      <div class="section-label"><i class="fas fa-envelope"></i> Contact</div>
+      <h2 class="section-title">Get in <span>Touch</span></h2>
+      <p class="section-desc">Have a question, suggestion, or want to collaborate? We'd love to hear from you.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="fade-in-left">
+        <div class="contact-info">
+          <h3>Let's Build Better Education Together</h3>
+          <p>Reach out to the StudyShare team for partnerships, feedback, or technical support.</p>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+          <div>
+            <h4>Email Us</h4>
+            <p>hello@studyshare.edu</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <div>
+            <h4>Location</h4>
+            <p>India – Accessible Worldwide</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon"><i class="fas fa-graduation-cap"></i></div>
+          <div>
+            <h4>SDG Project</h4>
+            <p>SDG 4 – Quality Education Initiative</p>
+          </div>
+        </div>
+      </div>
+      <div class="contact-form-card fade-in-right">
+        <form id="contact-form" onsubmit="handleContact(event)">
+          <div class="form-group">
+            <label>Your Name *</label>
+            <input type="text" id="c-name" placeholder="Full Name" required />
+          </div>
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" id="c-email" placeholder="your@email.com" required />
+          </div>
+          <div class="form-group">
+            <label>Subject *</label>
+            <input type="text" id="c-subject" placeholder="How can we help?" required />
+          </div>
+          <div class="form-group">
+            <label>Message *</label>
+            <textarea id="c-message" rows="4" placeholder="Tell us more..." required></textarea>
+          </div>
+          <button type="submit" class="btn-form">
+            <i class="fas fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo"><i class="fas fa-book-open"></i> StudyShare</div>
+        <p>A free educational resource sharing platform aligned with UN SDG 4 – Quality Education. Share knowledge, break barriers, empower learners.</p>
+        <div class="footer-socials">
+          <a href="#" class="footer-social"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="footer-social"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="footer-social"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="footer-social"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#library">Library</a></li>
+          <li><a href="#dashboard">Dashboard</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#upload">Upload Notes</a></li>
+          <li><a href="#upload">Upload Books</a></li>
+          <li><a href="#upload">Question Papers</a></li>
+          <li><a href="#categories">Browse Categories</a></li>
+          <li><a href="#contact">Get Support</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>SDG 4</h4>
+        <ul>
+          <li><a href="#sdg">Our Impact</a></li>
+          <li><a href="#sdg">Goals</a></li>
+          <li><a href="https://sdgs.un.org/goals/goal4" target="_blank">UN SDG Website</a></li>
+          <li><a href="#contact">Partner With Us</a></li>
+          <li><a href="#contact">Feedback</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 StudyShare. Made with <span>♥</span> for quality education. SDG 4 Project.</p>
+      <p>Share Knowledge · Empower Learning · Change Lives</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ==================== AUTH MODAL ==================== -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('authModal')"><i class="fas fa-times"></i></button>
+    <div class="modal-header">
+      <i class="fas fa-graduation-cap"></i>
+      <h2>Join StudyShare</h2>
+      <p>Share knowledge. Empower learning.</p>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+      <button class="modal-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+    </div>
+    <!-- Login Form -->
+    <div id="login-form">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Enter your password" />
+        <div class="form-error" id="login-error">Invalid email or password.</div>
+      </div>
+      <button class="btn-form" onclick="handleLogin()"><i class="fas fa-sign-in-alt"></i> Login</button>
+    </div>
+    <!-- Register Form -->
+    <div id="register-form" style="display:none">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="Your full name" />
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="reg-email" placeholder="your@email.com" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="Create a password (min 6 chars)" />
+        <div class="form-error" id="reg-error">Please fill all fields correctly.</div>
+      </div>
+      <button class="btn-form" onclick="handleRegister()"><i class="fas fa-user-plus"></i> Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== VIEW RESOURCE MODAL ==================== -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('viewModal')"><i class="fas fa-times"></i></button>
+    <div class="modal-header">
+      <i class="fas fa-file-alt"></i>
+      <h2 id="vm-title">Resource Details</h2>
+      <p id="vm-type-badge"></p>
+    </div>
+    <hr class="view-separator">
+    <div class="view-detail-row"><strong>Subject:</strong><span id="vm-subject"></span></div>
+    <div class="view-detail-row"><strong>Course:</strong><span id="vm-course"></span></div>
+    <div class="view-detail-row"><strong>Semester:</strong><span id="vm-sem"></span></div>
+    <div class="view-detail-row"><strong>Type:</strong><span id="vm-type"></span></div>
+    <div class="view-detail-row"><strong>Uploaded by:</strong><span id="vm-uploader"></span></div>
+    <div class="view-detail-row"><strong>Downloads:</strong><span id="vm-downloads"></span></div>
+    <hr class="view-separator">
+    <div class="view-detail-row" style="display:block">
+      <strong style="display:block;margin-bottom:8px">Description:</strong>
+      <p id="vm-desc" style="font-size:0.88rem;color:var(--gray-600);line-height:1.7"></p>
+    </div>
+    <hr class="view-separator">
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn-download" style="flex:1;padding:12px" id="vm-download-btn">
+        <i class="fas fa-download"></i> Download
+      </button>
+      <button class="btn-save" style="flex:1;padding:12px" id="vm-save-btn">
+        <i class="fas fa-bookmark"></i> Save Offline
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOAST CONTAINER ==================== -->
+<div id="toast-container"></div>
+
+<!-- ==================== SCROLL TO TOP ==================== -->
+<button id="scroll-top" onclick="scrollToTop()" title="Back to top">
+  <i class="fas fa-arrow-up"></i>
+</button>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+// ==================== SAMPLE DATA ====================
+const SAMPLE_RESOURCES = [
+  {
+    id: 'sample-1',
+    title: 'Data Structures & Algorithms – Complete Notes',
+    subject: 'Data Structures',
+    course: 'Computer Engineering',
+    sem: 'Semester 4',
+    type: 'Notes',
+    desc: 'Comprehensive notes covering arrays, linked lists, stacks, queues, trees, graphs, and sorting algorithms with examples.',
+    uploader: 'Rahul Sharma',
+    downloads: 342,
+    rating: 4.5,
+    ratings: [5,4,4,5,4,5],
+    savedBy: [],
+    timestamp: Date.now() - 86400000 * 5
+  },
+  {
+    id: 'sample-2',
+    title: 'Engineering Mathematics I – Textbook',
+    subject: 'Engineering Mathematics',
+    course: 'Computer Engineering',
+    sem: 'Semester 1',
+    type: 'Book',
+    desc: 'Standard textbook covering differential calculus, integral calculus, matrices, and complex numbers.',
+    uploader: 'Priya Patel',
+    downloads: 289,
+    rating: 4.2,
+    ratings: [4,4,5,4,4],
+    savedBy: [],
+    timestamp: Date.now() - 86400000 * 10
+  },
+  {
+    id: 'sample-3',
+    title: 'Civil Engineering – Previous Year Papers 2023',
+    subject: 'Structural Analysis',
+    course: 'Civil Engineering',
+    sem: 'Semester 6',
+    type: 'Question Paper',
+    desc: 'Complete set of 2023 university examination papers for Civil Engineering Semester 6.',
+    uploader: 'Amit Kumar',
+    downloads: 178,
+    rating: 4.7,
+    ratings: [5,5,4,5,4],
+    savedBy: [],
+    timestamp: Date.now() - 86400000 * 3
+  },
+  {
+    id: 'sample-4',
+    title: 'Digital Electronics – Lecture Notes',
+    subject: 'Digital Electronics',
+    course: 'Electronics Engineering',
+    sem: 'Semester 3',
+    type: 'Notes',
+    desc: 'Detailed notes on logic gates, flip-flops, counters, registers, and combinational circuits.',
+    uploader: 'Sneha Mehta',
+    downloads: 215,
+    rating: 4.3,
+    ratings: [4,5,4,4,4],
+    savedBy: [],
+    timestamp: Date.now() - 86400000 * 7
+  },
+  {
+    id: 'sample-5',
+    title: 'Thermodynamics – Complete Reference Book',
+    subject: 'Thermodynamics',
+    course: 'Mechanical Engineering',
+    sem: 'Semester 3',
+    type: 'Book',
+    desc: 'Covers all laws of thermodynamics, heat engines, refrigeration cycles, and entropy with solved problems.',
+    uploader: 'Vikram Singh',
+    downloads: 196,
+    rating: 4.0,
+    ratings: [4,4,4,4,4],
+    savedBy: [],
+    timestamp: Date.now() - 86400000 * 12
+  },
+  {
+    id: 'sample-6',
+    title: 'Accountancy – Class 12 Notes',
+    subject: 'Accountancy',
+    course: 'Commerce',
+    sem: 'Semester 2',
+    type: 'Notes',
+    desc: 'Complete notes for Class 12 Accountancy including partnership accounts, company accounts, and analysis of financial statements.',
+    uploader: 'Ananya Rao',
+    downloads: 143,
+    rating: 4.6,
+    ratings: [5,4,5,4,5],
+    savedBy: [],
+    timestamp: Date.now() - 86400000 * 2
+  }
+];
+
+// ==================== INIT ====================
+let resources = [];
+let currentUser = null;
+
+function init() {
+  // Merge sample + localStorage resources
+  const stored = JSON.parse(localStorage.getItem('ss_resources') || '[]');
+  resources = [...SAMPLE_RESOURCES, ...stored];
+
+  // Check session
+  const session = localStorage.getItem('ss_session');
+  if (session) {
+    currentUser = JSON.parse(session);
+    showUserBar();
+  }
+
+  renderLibrary();
+  updateDashboard();
+  setupScrollAnimations();
+  animateCounters();
+  startTypingEffect();
+  setupScrollTop();
+  animateProgressBars();
+}
+
+// ==================== LOADING SCREEN ====================
+(function() {
+  let p = 0;
+  const bar = document.getElementById('loading-bar');
+  const pct = document.getElementById('loading-pct');
+  const screen = document.getElementById('loading-screen');
+  const iv = setInterval(() => {
+    p += Math.random() * 18 + 5;
+    if (p >= 100) {
+      p = 100;
+      clearInterval(iv);
+      setTimeout(() => {
+        screen.classList.add('hidden');
+        setTimeout(() => { screen.remove(); init(); }, 600);
+      }, 300);
+    }
+    bar.style.width = p + '%';
+    pct.textContent = Math.floor(p) + '%';
+  }, 120);
+})();
+
+// ==================== TYPING EFFECT ====================
+function startTypingEffect() {
+  const texts = ['Share Notes', 'Share Books', 'Share Question Papers', 'Learn Together'];
+  let ti = 0, ci = 0, deleting = false;
+  const el = document.getElementById('typing-text');
+  function tick() {
+    const current = texts[ti];
+    if (!deleting) {
+      el.textContent = current.slice(0, ++ci);
+      if (ci === current.length) { deleting = true; setTimeout(tick, 1400); return; }
+    } else {
+      el.textContent = current.slice(0, --ci);
+      if (ci === 0) { deleting = false; ti = (ti + 1) % texts.length; }
+    }
+    setTimeout(tick, deleting ? 55 : 80);
+  }
+  tick();
+}
+
+// ==================== NAVBAR ====================
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('navbar');
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+});
+
+function toggleMobileMenu() {
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
+function closeMobileMenu() {
+  document.getElementById('mobile-menu').classList.remove('open');
+}
+
+// ==================== AUTH ====================
+function openModal(tab) {
+  document.getElementById('authModal').classList.add('open');
+  switchTab(tab || 'login');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+function switchTab(tab) {
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+}
+
+function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('show');
+  if (!email || !pass) { errEl.classList.add('show'); return; }
+
+  const users = JSON.parse(localStorage.getItem('ss_users') || '[]');
+  const user = users.find(u => u.email === email && u.password === pass);
+  if (!user) { errEl.textContent = 'Invalid email or password.'; errEl.classList.add('show'); return; }
+
+  currentUser = user;
+  localStorage.setItem('ss_session', JSON.stringify(user));
+  closeModal('authModal');
+  showUserBar();
+  toast('success', 'fas fa-check-circle', `Welcome back, ${user.name}!`);
+}
+
+function handleRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  const errEl = document.getElementById('reg-error');
+  errEl.classList.remove('show');
+
+  if (!name || !email || pass.length < 6) {
+    errEl.textContent = 'Please fill all fields. Password must be 6+ characters.';
+    errEl.classList.add('show'); return;
+  }
+
+  const users = JSON.parse(localStorage.getItem('ss_users') || '[]');
+  if (users.find(u => u.email === email)) {
+    errEl.textContent = 'This email is already registered.'; errEl.classList.add('show'); return;
+  }
+
+  const user = { name, email, password: pass, joined: Date.now() };
+  users.push(user);
+  localStorage.setItem('ss_users', JSON.stringify(users));
+  currentUser = user;
+  localStorage.setItem('ss_session', JSON.stringify(user));
+  closeModal('authModal');
+  showUserBar();
+  toast('success', 'fas fa-check-circle', `Welcome to StudyShare, ${name}!`);
+}
+
+function logout() {
+  currentUser = null;
+  localStorage.removeItem('ss_session');
+  document.getElementById('user-bar').classList.remove('show');
+  document.getElementById('nav-auth').style.display = '';
+  toast('success', 'fas fa-sign-out-alt', 'You have been logged out.');
+}
+
+function showUserBar() {
+  document.getElementById('user-name-display').textContent = currentUser.name;
+  document.getElementById('user-bar').classList.add('show');
+  document.getElementById('nav-auth').style.display = 'none';
+}
+
+// ==================== UPLOAD ====================
+let selectedFile = null;
+
+function handleFileSelect(input) {
+  selectedFile = input.files[0];
+  if (selectedFile) {
+    document.getElementById('file-name').textContent = selectedFile.name;
+    document.getElementById('file-preview').classList.add('show');
+  }
+}
+function removeFile() {
+  selectedFile = null;
+  document.getElementById('file-input').value = '';
+  document.getElementById('file-preview').classList.remove('show');
+}
+
+// Drag & drop
+const dz = document.getElementById('drop-zone');
+['dragover','dragenter'].forEach(e => dz.addEventListener(e, ev => { ev.preventDefault(); dz.classList.add('drag-over'); }));
+['dragleave','drop'].forEach(e => dz.addEventListener(e, ev => { ev.preventDefault(); dz.classList.remove('drag-over'); }));
+dz.addEventListener('drop', ev => {
+  const f = ev.dataTransfer.files[0];
+  if (f) { selectedFile = f; document.getElementById('file-name').textContent = f.name; document.getElementById('file-preview').classList.add('show'); }
+});
+
+function handleUpload(e) {
+  e.preventDefault();
+  if (!currentUser) {
+    openModal('login');
+    toast('warning', 'fas fa-exclamation-circle', 'Please login to upload resources.');
+    return;
+  }
+  const title = document.getElementById('res-title').value.trim();
+  const subject = document.getElementById('res-subject').value.trim();
+  const course = document.getElementById('res-course').value;
+  const sem = document.getElementById('res-sem').value;
+  const type = document.getElementById('res-type').value;
+  const desc = document.getElementById('res-desc').value.trim();
+
+  if (!title || !subject || !course || !type) {
+    toast('error', 'fas fa-times-circle', 'Please fill all required fields.');
+    return;
+  }
+
+  const resource = {
+    id: 'r' + Date.now(),
+    title, subject, course, sem: sem || 'Not specified', type,
+    desc: desc || 'No description provided.',
+    uploader: currentUser.name,
+    downloads: 0, rating: 0, ratings: [], savedBy: [],
+    timestamp: Date.now()
+  };
+
+  // Save to localStorage
+  const stored = JSON.parse(localStorage.getItem('ss_resources') || '[]');
+  stored.push(resource);
+  localStorage.setItem('ss_resources', JSON.stringify(stored));
+  resources.push(resource);
+
+  // Reset form
+  document.getElementById('upload-form').reset();
+  removeFile();
+
+  renderLibrary();
+  updateDashboard();
+  toast('success', 'fas fa-check-circle', 'Resource uploaded successfully! Thank you for sharing.');
+}
+
+// ==================== LIBRARY ====================
+function getTypeClass(type) {
+  if (type === 'Notes') return 'type-notes';
+  if (type === 'Book') return 'type-book';
+  return 'type-qp';
+}
+function getTypeIcon(type) {
+  if (type === 'Notes') return 'fas fa-file-alt';
+  if (type === 'Book') return 'fas fa-book';
+  return 'fas fa-question-circle';
+}
+
+function renderLibrary(categoryFilter) {
+  const q = (document.getElementById('search-q')?.value || '').toLowerCase();
+  const course = document.getElementById('filter-course')?.value || '';
+  const sem = document.getElementById('filter-sem')?.value || '';
+  const type = document.getElementById('filter-type')?.value || '';
+
+  let filtered = resources.filter(r => {
+    const matchQ = !q || r.title.toLowerCase().includes(q) || r.subject.toLowerCase().includes(q);
+    const matchCourse = !course || r.course === course;
+    const matchSem = !sem || r.sem === sem;
+    const matchType = !type || r.type === type;
+    const matchCat = !categoryFilter || r.course === categoryFilter;
+    return matchQ && matchCourse && matchSem && matchType && matchCat;
+  });
+
+  const grid = document.getElementById('resources-grid');
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="empty-library"><i class="fas fa-search"></i><p>No resources found. Try different filters or upload one!</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(r => {
+    const saved = r.savedBy && r.savedBy.includes(currentUser?.email);
+    const avgRating = r.ratings?.length ? (r.ratings.reduce((a,b)=>a+b,0)/r.ratings.length).toFixed(1) : '–';
+    const stars = [1,2,3,4,5].map(n =>
+      `<i class="fas fa-star ${n <= Math.round(r.ratings?.length ? r.ratings.reduce((a,b)=>a+b,0)/r.ratings.length : 0) ? 'filled' : ''}"
+        onclick="rateResource('${r.id}',${n})" title="Rate ${n} star"></i>`
+    ).join('');
+    return `
+    <div class="resource-card fade-in">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span class="resource-type-badge ${getTypeClass(r.type)}">
+          <i class="${getTypeIcon(r.type)}"></i> ${r.type}
+        </span>
+        <span class="download-count"><i class="fas fa-download"></i> ${r.downloads}</span>
+      </div>
+      <div class="resource-title">${r.title}</div>
+      <div class="resource-meta">
+        <span><i class="fas fa-book"></i> ${r.subject}</span>
+        <span><i class="fas fa-graduation-cap"></i> ${r.course}</span>
+        <span><i class="fas fa-layer-group"></i> ${r.sem}</span>
+      </div>
+      <p class="resource-desc">${r.desc}</p>
+      <div class="resource-uploader">
+        <div class="avatar">${r.uploader[0]}</div>
+        <span>${r.uploader}</span>
+        <div class="resource-stars">${stars}</div>
+        <span style="font-size:0.75rem;color:var(--gray-400);margin-left:4px">${avgRating}</span>
+      </div>
+      <div class="resource-actions">
+        <button class="btn-view" onclick="viewResource('${r.id}')"><i class="fas fa-eye"></i> View</button>
+        <button class="btn-download" onclick="downloadResource('${r.id}')"><i class="fas fa-download"></i> Download</button>
+        <button class="btn-save" onclick="saveResource('${r.id}')" title="${saved ? 'Saved!' : 'Save Offline'}">
+          <i class="fa${saved?'s':'r'} fa-bookmark"></i>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Trigger fade-in
+  setTimeout(() => {
+    document.querySelectorAll('#resources-grid .fade-in').forEach(el => el.classList.add('visible'));
+  }, 50);
+
+  updateDashboard();
+}
+
+function filterByCategory(cat) {
+  document.getElementById('filter-course').value = cat;
+  document.getElementById('library').scrollIntoView({ behavior: 'smooth' });
+  setTimeout(() => renderLibrary(), 400);
+}
+
+// ==================== VIEW RESOURCE ====================
+function viewResource(id) {
+  const r = resources.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('vm-title').textContent = r.title;
+  document.getElementById('vm-type-badge').textContent = r.type;
+  document.getElementById('vm-subject').textContent = r.subject;
+  document.getElementById('vm-course').textContent = r.course;
+  document.getElementById('vm-sem').textContent = r.sem;
+  document.getElementById('vm-type').textContent = r.type;
+  document.getElementById('vm-uploader').textContent = r.uploader;
+  document.getElementById('vm-downloads').textContent = r.downloads;
+  document.getElementById('vm-desc').textContent = r.desc;
+  document.getElementById('vm-download-btn').onclick = () => { downloadResource(id); closeModal('viewModal'); };
+  document.getElementById('vm-save-btn').onclick = () => { saveResource(id); };
+  document.getElementById('viewModal').classList.add('open');
+}
+
+// ==================== DOWNLOAD ====================
+function downloadResource(id) {
+  const idx = resources.findIndex(x => x.id === id);
+  if (idx < 0) return;
+  resources[idx].downloads++;
+
+  // Update localStorage if user-uploaded
+  const stored = JSON.parse(localStorage.getItem('ss_resources') || '[]');
+  const si = stored.findIndex(x => x.id === id);
+  if (si >= 0) { stored[si].downloads++; localStorage.setItem('ss_resources', JSON.stringify(stored)); }
+
+  renderLibrary();
+  toast('success', 'fas fa-download', `"${resources[idx].title}" download started!`);
+}
+
+// ==================== SAVE OFFLINE ====================
+function saveResource(id) {
+  if (!currentUser) { openModal('login'); toast('warning', 'fas fa-exclamation-circle', 'Login to save resources.'); return; }
+  const idx = resources.findIndex(x => x.id === id);
+  if (idx < 0) return;
+  const r = resources[idx];
+  if (!r.savedBy) r.savedBy = [];
+  const already = r.savedBy.includes(currentUser.email);
+  if (already) {
+    r.savedBy = r.savedBy.filter(e => e !== currentUser.email);
+    toast('success', 'fas fa-bookmark', 'Resource removed from saved list.');
+  } else {
+    r.savedBy.push(currentUser.email);
+    toast('success', 'fas fa-bookmark', `"${r.title}" saved offline!`);
+  }
+
+  const stored = JSON.parse(localStorage.getItem('ss_resources') || '[]');
+  const si = stored.findIndex(x => x.id === id);
+  if (si >= 0) { stored[si].savedBy = r.savedBy; localStorage.setItem('ss_resources', JSON.stringify(stored)); }
+
+  renderLibrary();
+  updateDashboard();
+}
+
+// ==================== RATINGS ====================
+function rateResource(id, stars) {
+  if (!currentUser) { openModal('login'); toast('warning', 'fas fa-exclamation-circle', 'Login to rate resources.'); return; }
+  const idx = resources.findIndex(x => x.id === id);
+  if (idx < 0) return;
+  if (!resources[idx].ratings) resources[idx].ratings = [];
+  resources[idx].ratings.push(stars);
+
+  const stored = JSON.parse(localStorage.getItem('ss_resources') || '[]');
+  const si = stored.findIndex(x => x.id === id);
+  if (si >= 0) { stored[si].ratings = resources[idx].ratings; localStorage.setItem('ss_resources', JSON.stringify(stored)); }
+
+  renderLibrary();
+  toast('success', 'fas fa-star', `Rated ${stars} star${stars>1?'s':''}!`);
+}
+
+// ==================== DASHBOARD ====================
+function updateDashboard() {
+  const totalUploads = resources.length;
+  const totalDownloads = resources.reduce((a,r) => a + (r.downloads||0), 0);
+  const savedCount = currentUser
+    ? resources.filter(r => r.savedBy?.includes(currentUser.email)).length
+    : 0;
+
+  // Animate numbers
+  animateNum('dash-uploads', totalUploads, 800);
+  animateNum('dash-downloads', totalDownloads, 800);
+  animateNum('dash-saved', savedCount, 800);
+
+  // Popular
+  const sorted = [...resources].sort((a,b) => (b.downloads||0) - (a.downloads||0));
+  const popEl = document.getElementById('popular-list');
+  if (popEl) {
+    popEl.innerHTML = sorted.slice(0, 5).map(r =>
+      `<div class="dash-table-row">
+        <span class="name">${r.title}</span>
+        <span class="type">${r.type}</span>
+        <span class="val">${r.downloads} DL</span>
+      </div>`
+    ).join('') || '<div class="dash-table-row"><span class="name" style="color:var(--gray-400)">No resources yet.</span></div>';
+  }
+
+  // Recent
+  const recent = [...resources].sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
+  const recEl = document.getElementById('recent-list');
+  if (recEl) {
+    recEl.innerHTML = recent.slice(0, 5).map(r =>
+      `<div class="dash-table-row">
+        <span class="name">${r.title}</span>
+        <span class="type">${r.type}</span>
+        <span class="val" style="color:var(--gray-400);font-size:0.75rem">${timeAgo(r.timestamp)}</span>
+      </div>`
+    ).join('') || '<div class="dash-table-row"><span class="name" style="color:var(--gray-400)">No resources yet.</span></div>';
+  }
+
+  // SDG money saved estimate
+  const moneySaved = totalDownloads * 150;
+  const moneyEl = document.getElementById('money-saved');
+  if (moneyEl) moneyEl.textContent = '₹' + moneySaved.toLocaleString('en-IN');
+}
+
+function timeAgo(ts) {
+  if (!ts) return 'Just now';
+  const diff = Date.now() - ts;
+  const d = Math.floor(diff / 86400000);
+  if (d === 0) return 'Today';
+  if (d === 1) return 'Yesterday';
+  return d + ' days ago';
+}
+
+function animateNum(id, target, duration) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const start = parseInt(el.textContent.replace(/,/g,'')) || 0;
+  const steps = 30;
+  const inc = (target - start) / steps;
+  let current = start;
+  let step = 0;
+  const iv = setInterval(() => {
+    current += inc;
+    step++;
+    el.textContent = Math.floor(current).toLocaleString();
+    if (step >= steps) { el.textContent = target.toLocaleString(); clearInterval(iv); }
+  }, duration / steps);
+}
+
+// ==================== SCROLL ANIMATIONS ====================
+function setupScrollAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        if (e.target.classList.contains('counter')) animateCounter(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right').forEach(el => observer.observe(el));
+  document.querySelectorAll('.counter').forEach(el => observer.observe(el));
+}
+
+function animateCounters() {
+  // Run counters once scroll animation picks them up
+  document.querySelectorAll('.counter').forEach(el => {
+    el.textContent = '0';
+  });
+}
+
+function animateCounter(el) {
+  if (el.dataset.animated) return;
+  el.dataset.animated = true;
+  const target = parseInt(el.dataset.target);
+  let current = 0;
+  const steps = 50;
+  const inc = target / steps;
+  const iv = setInterval(() => {
+    current += inc;
+    if (current >= target) { el.textContent = target.toLocaleString(); clearInterval(iv); return; }
+    el.textContent = Math.floor(current).toLocaleString();
+  }, 30);
+}
+
+// ==================== PROGRESS BARS ====================
+function animateProgressBars() {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const w = e.target.dataset.width || '0';
+        setTimeout(() => { e.target.style.width = w + '%'; }, 200);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.progress-bar').forEach(b => { b.style.width = '0%'; observer.observe(b); });
+}
+
+// ==================== SCROLL TO TOP ====================
+function setupScrollTop() {
+  const btn = document.getElementById('scroll-top');
+  window.addEventListener('scroll', () => btn.classList.toggle('visible', window.scrollY > 400));
+}
+function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+// ==================== TOAST ====================
+function toast(type, icon, msg) {
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<i class="${icon}"></i><p>${msg}</p>`;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0'; el.style.transform = 'translateX(100%)';
+    el.style.transition = 'all 0.3s ease';
+    setTimeout(() => el.remove(), 300);
+  }, 3500);
+}
+
+// ==================== CONTACT FORM ====================
+function handleContact(e) {
+  e.preventDefault();
+  const name = document.getElementById('c-name').value.trim();
+  const email = document.getElementById('c-email').value.trim();
+  const subject = document.getElementById('c-subject').value.trim();
+  const msg = document.getElementById('c-message').value.trim();
+  if (!name || !email || !subject || !msg) {
+    toast('error', 'fas fa-times-circle', 'Please fill all fields.'); return;
+  }
+  document.getElementById('contact-form').reset();
+  toast('success', 'fas fa-paper-plane', 'Message sent! We\'ll get back to you soon.');
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+
+// ESC key closes modals
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+});
+</script>
+</body>
+</html>
